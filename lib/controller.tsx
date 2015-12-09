@@ -1,0 +1,105 @@
+'use strict';
+
+import * as _ from 'underscore';
+import * as React from 'react';
+import * as gk from 'gamekernel';
+import Engine from './engine.ts';
+import KeyboardBehavior from './controls/keyboard-behavior.ts';
+import { SlideshowComponent } from './components/slideshow-component.tsx';
+import { ResultComponent } from './components/result-component.tsx';
+import * as dieType from './dice/die-type.ts';
+import { diceStore } from './stores/dice-store.ts';
+import { dispatcher } from './dispatcher.ts';
+
+export enum ScreenState { Rolling, Results };
+
+export interface Props {
+  engine: Engine;
+}
+
+export interface State {
+  screen: ScreenState;
+  die: dieType.DieType;
+}
+
+export class Controller extends React.Component<Props, State> {
+  private engine: Engine;
+  private world: gk.Entity = null;
+  private controlEntity: gk.Entity = null;
+  private countdown = _.debounce(() => {
+    this.switchScreen();
+  }, 500);
+
+  constructor(props: Props) {
+    super(props);
+
+    this.engine = props.engine;
+
+    this.state = {
+      screen: ScreenState.Rolling,
+      die: diceStore.current.die
+    };
+
+    diceStore.watch((diceState) => {
+      this.setState({
+        screen: this.state.screen,
+        die: diceState.die
+      });
+
+      if(diceState.rolls.length > 0) this.countdown();
+    });
+  }
+
+  componentDidMount() {
+    this.world = this.engine.kernel.root().entity();
+    this.engine.behavior.table.attach(this.world, new KeyboardBehavior(this.engine, this));
+  }
+
+  componentWillUnmount() {
+    this.world.destroy();
+  }
+
+  left() {
+    if(this.state.screen === ScreenState.Results) return;
+    dispatcher.left.dispatch({});
+  }
+
+  right() {
+    if(this.state.screen === ScreenState.Results) return;
+    dispatcher.right.dispatch({});
+  }
+
+  switchScreen() {
+    this.setState({
+      screen: this.nextScreenState(),
+      die: this.state.die
+    });
+  }
+
+  action() {
+    if(this.state.screen === ScreenState.Results) {
+      dispatcher.reroll.dispatch({});
+      this.switchScreen();
+      return;
+    }
+    dispatcher.button.dispatch({});
+  }
+
+  nextScreenState(): ScreenState {
+    if(this.state.screen === ScreenState.Results) return ScreenState.Rolling;
+    return ScreenState.Results;
+  }
+
+  render() {
+    const currentAppState = diceStore.current;
+    const activeResults = this.state.screen === ScreenState.Results;
+    const rollValue = currentAppState.die.value(currentAppState.rolls);
+
+    return (
+      <div>
+        <SlideshowComponent dice={ dieType.allTypes } die={ this.state.die } />
+        <ResultComponent result={ rollValue } active={ activeResults } die={ this.state.die } />
+      </div>
+    );
+  }
+}

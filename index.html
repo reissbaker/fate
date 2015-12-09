@@ -1,0 +1,104 @@
+<html doctype="html">
+  <head>
+    <meta charset="utf-8">
+    <title>Roller</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+html, body, div, ul, li {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.app-container {
+  overflow-x: hidden;
+}
+
+.slideshow {
+  white-space: nowrap;
+  vertical-align: top;
+  list-style: none;
+  transform: translateX(0);
+  transition: transform 0.7s;
+}
+
+.slideshow .slide-container {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.slide {
+  position: relative;
+  white-space: normal;
+  vertical-align: top;
+}
+
+.result {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  transition: opacity 0.4s;
+  background-color: #F9F9F9;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.full-size {
+  height: 100vh;
+  width: 100vw;
+}
+
+.slide-content {
+  position: absolute;
+}
+
+h1 {
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  text-align: center;
+  width: 100%;
+  height: 100vh;
+  line-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.slideshow-dots-container {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+}
+
+.slideshow-dots {
+  transform: translateX(-50%);
+}
+
+.dot {
+  background-color: white;
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  margin: 15px 3px;
+  border-radius: 4.5px;
+  opacity: 0.5;
+  transition: opacity 0.5s;
+}
+
+.dot.active {
+  opacity: 1;
+}
+    </style>
+  </head>
+
+  <body>
+    <div id="app-container-js" class="app-container">
+    </div>
+
+    <script src="./build/roller.js"></script>
+  </body>
+</html>
