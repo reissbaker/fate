@@ -98,7 +98,12 @@ export class Controller extends React.Component<Props, State> {
     return (
       <div>
         <SlideshowComponent dice={ dieType.allTypes } die={ this.state.die } />
-        <ResultComponent result={ rollValue } active={ activeResults } die={ this.state.die } />
+        <ResultComponent
+          result={ rollValue }
+          active={ activeResults }
+          die={ this.state.die }
+          rolls={ currentAppState.rolls }
+        />
       </div>
     );
   }

@@ -8,6 +8,7 @@ const HIDE_CLASS = "hidden";
 export interface Props {
   active: boolean;
   result: number;
+  rolls: number[];
   die: DieType;
 }
 
@@ -21,7 +22,21 @@ export class ResultComponent extends React.Component<Props, {}> {
     return (
       <div className={ "full-size result " + visibilityClass } style={ style }>
         <div className="slide-content full-size">
-          <h1>{ this.props.result }</h1>
+          <div className="center-content">
+            <h1>{ this.props.result }</h1>
+            <ul className={ "results-list " + (this.props.rolls.length === 1 ? "hidden" : "") }>
+              {
+                this.props.rolls.map((roll, index) => {
+                  return (
+                    <li key={ 'roll-' + index }>
+                      { roll }
+                      { index === this.props.rolls.length - 1 ? "" : " + " }
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          </div>
         </div>
       </div>
     );

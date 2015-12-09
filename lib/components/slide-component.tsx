@@ -20,7 +20,7 @@ export class SlideComponent extends React.Component<Die, {}> {
     return (
       <div className="slide full-size" style={ style }>
         <div className="slide-content full-size">
-          <h1>{ this.props.displayName }</h1>
+          <h1 className="center-content">{ this.props.displayName }</h1>
         </div>
       </div>
     );
