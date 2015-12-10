@@ -20,7 +20,10 @@ export interface Props {
 export interface State {
   screen: ScreenState;
   die: dieType.DieType;
+  rolls: number[];
 }
+
+const ROLL_DEBOUNCE_MS = 500;
 
 export class Controller extends React.Component<Props, State> {
   private engine: Engine;
@@ -28,7 +31,7 @@ export class Controller extends React.Component<Props, State> {
   private controlEntity: gk.Entity = null;
   private countdown = _.debounce(() => {
     this.switchScreen();
-  }, 500);
+  }, ROLL_DEBOUNCE_MS);
 
   constructor(props: Props) {
     super(props);
@@ -37,13 +40,15 @@ export class Controller extends React.Component<Props, State> {
 
     this.state = {
       screen: ScreenState.Rolling,
-      die: diceStore.current.die
+      die: diceStore.current.die,
+      rolls: [],
     };
 
     diceStore.watch((diceState) => {
       this.setState({
         screen: this.state.screen,
-        die: diceState.die
+        die: diceState.die,
+        rolls: diceState.rolls,
       });
 
       if(diceState.rolls.length > 0) this.countdown();
@@ -72,7 +77,8 @@ export class Controller extends React.Component<Props, State> {
   switchScreen() {
     this.setState({
       screen: this.nextScreenState(),
-      die: this.state.die
+      die: this.state.die,
+      rolls: this.state.rolls,
     });
   }
 
@@ -97,12 +103,12 @@ export class Controller extends React.Component<Props, State> {
 
     return (
       <div>
-        <SlideshowComponent dice={ dieType.allTypes } die={ this.state.die } />
+        <SlideshowComponent dice={ dieType.allTypes } die={ this.state.die } rolls={ this.state.rolls} rollDebounceMs={ ROLL_DEBOUNCE_MS } />
         <ResultComponent
           result={ rollValue }
           active={ activeResults }
           die={ this.state.die }
-          rolls={ currentAppState.rolls }
+          rolls={ this.state.rolls }
         />
       </div>
     );

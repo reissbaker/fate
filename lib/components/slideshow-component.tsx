@@ -7,6 +7,8 @@ import { DieType } from '../dice/die-type.ts';
 export interface Props {
   dice: slide.Die[];
   die: DieType;
+  rolls: number[];
+  rollDebounceMs: number;
 }
 
 export interface SlideshowState {
@@ -18,6 +20,10 @@ export class SlideshowComponent extends React.Component<Props, SlideshowState> {
     const index = this.props.dice.indexOf(this.props.die);
     const style = {
       transform: 'translateX(' + (-index * 100) + '%)'
+    };
+
+    const rollIndicatorStyle = {
+      //transition: 'background-color ' + (this.props.rollDebounceMs / 1000) + 's'
     };
 
     return (
@@ -33,6 +39,20 @@ export class SlideshowComponent extends React.Component<Props, SlideshowState> {
             })
           }
         </ul>
+        <div className="rolls-container">
+          {
+            [ 0, 1, 2, 3, 4, 5 ].map((i) => {
+              const activeClass = i < this.props.rolls.length ? "active" : "";
+              return (
+                <div
+                  className={ "roll " + activeClass }
+                  key={ "roll-" + i }
+                  style={ rollIndicatorStyle }
+                />
+              );
+            })
+          }
+        </div>
         <div className="slideshow-dots-container">
           <div className="slideshow-dots">
             {
