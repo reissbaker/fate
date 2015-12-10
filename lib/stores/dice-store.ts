@@ -12,7 +12,7 @@ export interface DiceState {
 }
 
 export const diceStore = app.store<DiceState>((getState, setState) => {
-  dispatcher.button.bind((data) => {
+  dispatcher.button.bind(() => {
     const current = getState();
 
     setState(_.extend({}, current, {
@@ -20,7 +20,7 @@ export const diceStore = app.store<DiceState>((getState, setState) => {
     }));
   });
 
-  dispatcher.left.bind((data) => {
+  dispatcher.left.bind(() => {
     let index = dieType.allTypes.indexOf(getState().die) - 1;
     if(index < 0) index = 0;
 
@@ -30,7 +30,7 @@ export const diceStore = app.store<DiceState>((getState, setState) => {
     });
   });
 
-  dispatcher.right.bind((data) => {
+  dispatcher.right.bind(() => {
     let index = dieType.allTypes.indexOf(getState().die) + 1;
     if(index >= dieType.allTypes.length) index = dieType.allTypes.length - 1;
 
@@ -40,7 +40,7 @@ export const diceStore = app.store<DiceState>((getState, setState) => {
     });
   });
 
-  dispatcher.reroll.bind((data) => {
+  dispatcher.reroll.bind(() => {
     setState({
       die: getState().die,
       rolls: []
