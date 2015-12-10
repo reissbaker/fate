@@ -103,7 +103,12 @@ export class Controller extends React.Component<Props, State> {
 
     return (
       <div>
-        <SlideshowComponent dice={ dieType.allTypes } die={ this.state.die } rolls={ this.state.rolls} rollDebounceMs={ ROLL_DEBOUNCE_MS } />
+        <SlideshowComponent
+          dice={ dieType.allTypes }
+          die={ this.state.die }
+          rolls={ this.state.rolls}
+          rollDebounceMs={ ROLL_DEBOUNCE_MS }
+        />
         <ResultComponent
           result={ rollValue }
           active={ activeResults }
