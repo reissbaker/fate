@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as slide from './slide-component.tsx';
+import { RollIndicatorComponent } from './roll-indicator-component.tsx';
 import { DieType } from '../dice/die-type.ts';
 
 export interface Props {
@@ -22,10 +23,6 @@ export class SlideshowComponent extends React.Component<Props, SlideshowState> {
       transform: 'translateX(' + (-index * 100) + '%)'
     };
 
-    const rollIndicatorStyle = {
-      //transition: 'background-color ' + (this.props.rollDebounceMs / 1000) + 's'
-    };
-
     return (
       <div>
         <ul className="slideshow" style={ style }>
@@ -39,20 +36,9 @@ export class SlideshowComponent extends React.Component<Props, SlideshowState> {
             })
           }
         </ul>
-        <div className="rolls-container">
-          {
-            [ 0, 1, 2, 3, 4, 5 ].map((i) => {
-              const activeClass = i < this.props.rolls.length ? "active" : "";
-              return (
-                <div
-                  className={ "roll " + activeClass }
-                  key={ "roll-" + i }
-                  style={ rollIndicatorStyle }
-                />
-              );
-            })
-          }
-        </div>
+
+        <RollIndicatorComponent rolls={ this.props.rolls } rollDebounceMs={ this.props.rollDebounceMs } />
+
         <div className="slideshow-dots-container">
           <div className="slideshow-dots">
             {
