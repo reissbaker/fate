@@ -17,8 +17,10 @@ export class SlideComponent extends React.Component<Die, {}> {
       color: this.props.color,
     };
 
+
     if(this.props.active) {
-      document.querySelector("#meta-theme-color").setAttribute("content", this.props.color);
+      const el = document.querySelector("#meta-theme-color");
+      el.setAttribute("content", this.props.backgroundColor);
     }
 
     return (
