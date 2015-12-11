@@ -1,5 +1,6 @@
 {
   "name": "Fate",
+  "start_url": "/fate",
   "icons": [
     {
       "src": "/fate/assets/icons/d20-2x.png",
@@ -17,6 +18,6 @@
       "type": "image/png"
     }
   ],
-  "display": "browser",
+  "display": "standalone",
   "orientation": "portrait"
 }

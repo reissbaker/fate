@@ -16,6 +16,7 @@ if(STANDALONE) {
   const meta = document.createElement("meta");
   meta.name = "theme-color";
   meta.content = "#000";
+  meta.id = 'meta-theme-color';
   document.querySelector('head').appendChild(meta);
 }
 
