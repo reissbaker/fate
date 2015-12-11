@@ -10,6 +10,15 @@ export interface Die {
   active: boolean;
 }
 
+const STANDALONE = window.matchMedia("(display-mode: standalone)").matches;
+
+if(STANDALONE) {
+  const meta = document.createElement("meta");
+  meta.name = "theme-color";
+  meta.content = "#000";
+  document.querySelector('head').appendChild(meta);
+}
+
 export class SlideComponent extends React.Component<Die, {}> {
   render() {
     const style = {
@@ -17,8 +26,7 @@ export class SlideComponent extends React.Component<Die, {}> {
       color: this.props.color,
     };
 
-
-    if(this.props.active) {
+    if (STANDALONE && this.props.active) {
       const el = document.querySelector("#meta-theme-color");
       el.setAttribute("content", this.props.backgroundColor);
     }
