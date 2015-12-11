@@ -2,6 +2,9 @@
 
 import * as React from 'react';
 
+const DEFAULT_COLOR = 0xFFFFFF;
+const HIGHLIGHT_COLOR = 0xFFFF00;
+
 export interface Props {
   rolls: number[];
   rollDebounceMs: number;
@@ -9,8 +12,8 @@ export interface Props {
 
 export interface State {
   numRolls: number;
-  opacity: number;
-  targetOpacity: number;
+  color: number;
+  targetColor: number;
 }
 
 export class RollIndicatorComponent extends React.Component<Props, State> {
@@ -18,8 +21,8 @@ export class RollIndicatorComponent extends React.Component<Props, State> {
     super();
 
     this.state = {
-      opacity: 1,
-      targetOpacity: 1,
+      color: HIGHLIGHT_COLOR,
+      targetColor: HIGHLIGHT_COLOR,
       numRolls: 0,
     };
   }
@@ -31,8 +34,8 @@ export class RollIndicatorComponent extends React.Component<Props, State> {
 
     this.setState({
       numRolls: currRolls,
-      opacity: noRolls || currRolls !== prevRolls ? 1 : this.state.opacity,
-      targetOpacity: noRolls ? 1 : 0,
+      color: noRolls || currRolls !== prevRolls ? HIGHLIGHT_COLOR : this.state.color,
+      targetColor: noRolls ? HIGHLIGHT_COLOR : DEFAULT_COLOR,
     });
   }
 
