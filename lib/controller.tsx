@@ -2,7 +2,9 @@
 
 import * as _ from 'underscore';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import * as gk from 'gamekernel';
+import * as Hammer from 'hammerjs';
 import Engine from './engine.ts';
 import KeyboardBehavior from './controls/keyboard-behavior.ts';
 import { SlideshowComponent } from './components/slideshow-component.tsx';
@@ -58,6 +60,20 @@ export class Controller extends React.Component<Props, State> {
   componentDidMount() {
     this.world = this.engine.kernel.root().entity();
     this.engine.behavior.table.attach(this.world, new KeyboardBehavior(this.engine, this));
+
+    const hm = new Hammer.Manager(ReactDOM.findDOMNode(this));
+    this.engine.hammer.control.attach(this.world, hm);
+    hm.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_HORIZONTAL }));
+    hm.add(new Hammer.Tap());
+    hm.on("swipeleft", () => {
+      this.right();
+    });
+    hm.on("swiperight", () => {
+      this.left();
+    });
+    hm.on("tap", () => {
+      this.action();
+    });
   }
 
   componentWillUnmount() {

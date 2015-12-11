@@ -2,10 +2,12 @@
 
 import * as gk from 'gamekernel';
 import * as keyboard from 'gk-keyboard';
+import * as hammer from './controls/hammer-system.ts';
 
 export default class Engine extends gk.Engine {
   keyboard = new keyboard.KeyboardSystem();
   behavior = new gk.BehaviorSystem();
+  hammer = new hammer.HammerSystem;
 
   private _runner: gk.Runner;
 
@@ -16,6 +18,7 @@ export default class Engine extends gk.Engine {
 
     kernel.attach(this.keyboard);
     kernel.attach(this.behavior);
+    kernel.attach(this.hammer);
   }
 
   start() {

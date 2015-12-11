@@ -1,4 +1,5 @@
 ///<reference path="./typings/tsd.d.ts"/>
+///<reference path="./custom-typings/hammerjs.d.ts"/>
 'use strict';
 
 import * as React from 'react';
