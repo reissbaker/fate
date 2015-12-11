@@ -64,7 +64,7 @@ export class Controller extends React.Component<Props, State> {
     const hm = new Hammer.Manager(ReactDOM.findDOMNode(this));
     this.engine.hammer.control.attach(this.world, hm);
     hm.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_HORIZONTAL }));
-    hm.add(new Hammer.Tap({ interval: 100, time: 100, threshold: 10 }));
+    hm.add(new Hammer.Tap({ interval: 100, time: 300, threshold: 10 }));
     hm.on("swipeleft", () => {
       this.right();
     });
