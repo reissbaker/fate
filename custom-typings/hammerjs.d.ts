@@ -17,6 +17,7 @@ declare module "hammerjs" {
   }
 
   export class Tap extends Recognizer {
+    constructor(opts: { interval?: number, threshold?: number, time?: number });
   }
 
   export const DIRECTION_HORIZONTAL: string;
