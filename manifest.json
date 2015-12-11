@@ -1,19 +1,19 @@
 {
   "name": "Fate",
-  "start_url": "index.html",
+  "start_url": "/index.html",
   "icons": [
     {
-      "src": "assets/icons/d20-2x.png",
+      "src": "/assets/icons/d20-2x.png",
       "sizes": "96x96",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/d20-3x.png",
+      "src": "/assets/icons/d20-3x.png",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "assets/icons/d20-4x.png",
+      "src": "/assets/icons/d20-4x.png",
       "sizes": "192x192",
       "type": "image/png"
     }
