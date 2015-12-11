@@ -7,7 +7,7 @@ export interface Die {
   color: string;
   displayName: string;
   icon: string;
-  max: number;
+  active: boolean;
 }
 
 export class SlideComponent extends React.Component<Die, {}> {
@@ -16,6 +16,10 @@ export class SlideComponent extends React.Component<Die, {}> {
       backgroundColor: this.props.backgroundColor,
       color: this.props.color,
     };
+
+    if(this.props.active) {
+      document.querySelector("#meta-theme-color").setAttribute("content", this.props.color);
+    }
 
     return (
       <div className="slide full-size" style={ style }>

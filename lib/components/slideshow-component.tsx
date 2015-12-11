@@ -6,7 +6,7 @@ import { RollIndicatorComponent } from './roll-indicator-component.tsx';
 import { DieType } from '../dice/die-type.ts';
 
 export interface Props {
-  dice: slide.Die[];
+  dice: DieType[];
   die: DieType;
   rolls: number[];
   rollDebounceMs: number;
@@ -27,10 +27,16 @@ export class SlideshowComponent extends React.Component<Props, SlideshowState> {
       <div>
         <ul className="slideshow" style={ style }>
           {
-            this.props.dice.map((die) => {
+            this.props.dice.map((die, i) => {
               return (
                 <li key={ die.displayName } className="slide-container">
-                  <slide.SlideComponent { ...die }/>
+                  <slide.SlideComponent
+                    backgroundColor={ die.backgroundColor }
+                    color={ die.color }
+                    displayName={ die.displayName }
+                    icon={ die.icon }
+                    active={ i === index }
+                  />
                 </li>
               );
             })
