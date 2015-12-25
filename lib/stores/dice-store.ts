@@ -11,40 +11,38 @@ export interface DiceState {
   rolls: number[];
 }
 
-export const diceStore = app.store<DiceState>((getState, setState) => {
-  dispatcher.button.bind(() => {
-    const current = getState();
-
-    setState(_.extend({}, current, {
-      rolls: current.rolls.concat([ roll(current.die) ])
-    }));
+export const diceStore = app.store<DiceState>((builder) => {
+  builder.reduce(dispatcher.button, (state) => {
+    return _.extend({}, state, {
+      rolls: state.rolls.concat([ roll(state.die) ])
+    });
   });
 
-  dispatcher.left.bind(() => {
-    let index = dieType.allTypes.indexOf(getState().die) - 1;
+  builder.reduce(dispatcher.left, (state) => {
+    let index = dieType.allTypes.indexOf(state.die) - 1;
     if(index < 0) index = 0;
 
-    setState({
+    return {
       rolls: [],
       die: dieType.allTypes[index]
-    });
+    };
   });
 
-  dispatcher.right.bind(() => {
-    let index = dieType.allTypes.indexOf(getState().die) + 1;
+  builder.reduce(dispatcher.right, (state) => {
+    let index = dieType.allTypes.indexOf(state.die) + 1;
     if(index >= dieType.allTypes.length) index = dieType.allTypes.length - 1;
 
-    setState({
+    return {
       rolls: [],
       die: dieType.allTypes[index]
-    });
+    };
   });
 
-  dispatcher.reroll.bind(() => {
-    setState({
-      die: getState().die,
+  builder.reduce(dispatcher.reroll, (state) => {
+    return {
+      die: state.die,
       rolls: []
-    });
+    };
   });
 
   return {

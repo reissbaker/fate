@@ -42,7 +42,7 @@ export class Controller extends React.Component<Props, State> {
 
     this.state = {
       screen: ScreenState.Rolling,
-      die: diceStore.current.die,
+      die: diceStore.state.die,
       rolls: [],
     };
 
@@ -113,7 +113,7 @@ export class Controller extends React.Component<Props, State> {
   }
 
   render() {
-    const currentAppState = diceStore.current;
+    const currentAppState = diceStore.state;
     const activeResults = this.state.screen === ScreenState.Results;
     const rollValue = currentAppState.die.value(currentAppState.rolls);
 

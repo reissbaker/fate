@@ -16,7 +16,7 @@
     "uglify-js": "^2.5.0"
   },
   "dependencies": {
-    "zeroflux": "0.0.5",
+    "zeroflux": "0.0.6",
     "gamekernel": "0.0.13",
     "gk-keyboard": "0.0.3",
     "react": "^0.14.2",
