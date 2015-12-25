@@ -95,7 +95,10 @@ export class SlideshowComponent extends ActivatableComponent<Props, SlideshowSta
           }
         </ul>
 
-        <RollIndicatorComponent rolls={ this.props.rolls } rollDebounceMs={ this.props.rollDebounceMs } />
+        <RollIndicatorComponent
+          rolls={ this.props.rolls }
+          rollDebounceMs={ this.props.rollDebounceMs }
+        />
 
         <div className="slideshow-dots-container">
           <div className="slideshow-dots">
