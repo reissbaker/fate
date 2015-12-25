@@ -191,6 +191,7 @@ var SlideshowComponent = (function (_super) {
         var world = this.props.world;
         var engine = this.props.engine;
         this._entity = world.entity();
+        // TODO: move control setup into a single function that both this and resultscomponent call
         engine.behavior.table.attach(this._entity, new keyboard_behavior_ts_1.default(engine, this));
         var hm = new Hammer.Manager(ReactDOM.findDOMNode(this));
         engine.hammer.control.attach(this._entity, hm);

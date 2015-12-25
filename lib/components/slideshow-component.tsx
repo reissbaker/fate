@@ -34,6 +34,8 @@ export class SlideshowComponent extends ActivatableComponent<Props, SlideshowSta
     const engine = this.props.engine;
 
     this._entity = world.entity();
+
+    // TODO: move control setup into a single function that both this and resultscomponent call
     engine.behavior.table.attach(this._entity, new KeyboardBehavior(engine, this));
 
     const hm = new Hammer.Manager(ReactDOM.findDOMNode(this));
