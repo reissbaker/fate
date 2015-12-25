@@ -29,11 +29,7 @@ export class Controller extends React.Component<Props, State> {
   private world: gk.Entity = null;
   private controlEntity: gk.Entity = null;
   private countdown = _.debounce(() => {
-    this.setState({
-      screen: ScreenState.Results,
-      die: diceStore.state.die,
-      rolls: diceStore.state.rolls,
-    });
+    this.setScreen(ScreenState.Results);
   }, ROLL_DEBOUNCE_MS);
 
   constructor(props: Props) {
@@ -58,11 +54,7 @@ export class Controller extends React.Component<Props, State> {
     });
 
     dispatcher.reroll.bind(() => {
-      this.setState({
-        screen: ScreenState.Rolling,
-        die: diceStore.state.die,
-        rolls: diceStore.state.rolls,
-      });
+      this.setScreen(ScreenState.Rolling);
     });
   }
 
@@ -72,6 +64,14 @@ export class Controller extends React.Component<Props, State> {
 
   componentWillUnmount() {
     this.world.destroy();
+  }
+
+  setScreen(screen: ScreenState) {
+    this.setState({
+      screen,
+      die: diceStore.state.die,
+      rolls: diceStore.state.rolls,
+    });
   }
 
   render() {
