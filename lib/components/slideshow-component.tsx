@@ -1,22 +1,72 @@
 'use strict';
 
+import * as gk from 'gamekernel';
+import { ActivatableComponent } from './activatable-component.ts';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import * as Hammer from 'hammerjs';
 import * as slide from './slide-component.tsx';
 import { RollIndicatorComponent } from './roll-indicator-component.tsx';
 import { DieType } from '../dice/die-type.ts';
+import Engine from '../engine.ts';
+import KeyboardBehavior from '../controls/keyboard-behavior.ts';
+import { dispatcher } from '../dispatcher.ts';
 
 export interface Props {
   dice: DieType[];
   die: DieType;
   rolls: number[];
   rollDebounceMs: number;
+  engine: Engine;
+  world: gk.Entity;
+  active: boolean;
 }
 
 export interface SlideshowState {
   slideIndex: number;
 }
 
-export class SlideshowComponent extends React.Component<Props, SlideshowState> {
+export class SlideshowComponent extends ActivatableComponent<Props, SlideshowState> {
+  private _entity: gk.Entity;
+
+  activate() {
+    const world = this.props.world;
+    const engine = this.props.engine;
+
+    this._entity = world.entity();
+    engine.behavior.table.attach(this._entity, new KeyboardBehavior(engine, this));
+
+    const hm = new Hammer.Manager(ReactDOM.findDOMNode(this));
+    engine.hammer.control.attach(this._entity, hm);
+    hm.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_HORIZONTAL }));
+    engine.hammer.supportTap(hm);
+    hm.on("swipeleft", () => {
+      this.right();
+    });
+    hm.on("swiperight", () => {
+      this.left();
+    });
+    hm.on("tap", () => {
+      this.action();
+    });
+  }
+
+  deactivate() {
+    this._entity.destroy();
+  }
+
+  left() {
+    dispatcher.left.dispatch({});
+  }
+
+  right() {
+    dispatcher.right.dispatch({});
+  }
+
+  action() {
+    dispatcher.button.dispatch({});
+  }
+
   render() {
     const index = this.props.dice.indexOf(this.props.die);
     const style = {

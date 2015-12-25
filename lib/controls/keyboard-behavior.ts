@@ -16,13 +16,17 @@ export default class KeyboardBehavior extends gk.Behavior {
 
   update(delta: number): void {
     if(this._keyboard.pressed(this._keyboard.key.SPACE)) this._callbacks.action();
-    if(this._keyboard.pressed(this._keyboard.key.LEFT)) this._callbacks.left();
-    if(this._keyboard.pressed(this._keyboard.key.RIGHT)) this._callbacks.right();
+    if(this._keyboard.pressed(this._keyboard.key.LEFT)) {
+      if(this._callbacks.left) this._callbacks.left();
+    }
+    if(this._keyboard.pressed(this._keyboard.key.RIGHT)) {
+      if(this._callbacks.right) this._callbacks.right();
+    }
   }
 }
 
 export interface Args {
   action: () => any;
-  left: () => any;
-  right: () => any;
+  left?: () => any;
+  right?: () => any;
 }
