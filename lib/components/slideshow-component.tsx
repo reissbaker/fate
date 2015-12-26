@@ -28,6 +28,8 @@ export interface State {
   velocity: number;
 }
 
+const MAX_TIME = 0.7;
+
 export class SlideshowComponent extends GkReactComponent<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -71,7 +73,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
         if(deltaX < 0) velocity = -velocity;
 
-        velocity = velocity * 0.5 + this.state.velocity * 0.5;
+        velocity = velocity * 0.25 + this.state.velocity * 0.75;
 
         this.setState({
           panning: this.state.panning,
@@ -152,11 +154,11 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       const distance = percentDistance * document.body.clientWidth;
       const velocity = Math.abs(this.state.velocity * 1000);
       const time = distance / velocity;
-      if(time > 0.7) return 0.7;
+      if(time > MAX_TIME) return MAX_TIME;
       return time;
     }
 
-    return 0.7;
+    return MAX_TIME;
   }
 
   transitionEasing() {
