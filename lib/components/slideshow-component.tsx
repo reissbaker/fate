@@ -167,7 +167,16 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
   }
 
   render() {
-    const index = this.props.dice.indexOf(this.props.die);
+    let index = this.props.dice.indexOf(this.props.die);
+    if(this.percentPan() >= 40) {
+      index = index - 1;
+      if(index < 0) index = 0;
+    }
+    else if(this.percentPan() <= -40) {
+      index = index + 1;
+      if(index >= this.props.dice.length) index = this.props.dice.length - 1;
+    }
+
     const style = {
       transition: `transform ${this.transitionTime()}s`,
       transitionTimingFunction: this.transitionEasing(),
