@@ -73,7 +73,10 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
         if(deltaX < 0) velocity = -velocity;
 
-        velocity = velocity * 0.25 + this.state.velocity * 0.75;
+        // Unless the velocity changed direction, take a moving average of the last velocities seen.
+        if(velocity < 0 === this.state.velocity < 0) {
+          velocity = velocity * 0.25 + this.state.velocity * 0.75;
+        }
 
         this.setState({
           panning: this.state.panning,
