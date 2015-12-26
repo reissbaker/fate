@@ -13,9 +13,10 @@ export interface DiceState {
 
 export const diceStore = app.store<DiceState>((builder) => {
   builder.reduce(dispatcher.button, (state) => {
-    return _.extend({}, state, {
-      rolls: state.rolls.concat([ roll(state.die) ])
-    });
+    return {
+      rolls: state.rolls.concat([ roll(state.die) ]),
+      die: state.die,
+    };
   });
 
   builder.reduce(dispatcher.left, (state) => {
