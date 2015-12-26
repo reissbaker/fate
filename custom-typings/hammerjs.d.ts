@@ -2,7 +2,7 @@ declare module "hammerjs" {
   export class Manager {
     constructor(el: Element, opts?: {});
     add(r: Recognizer): void;
-    on(ev: string, cb: (...args: any[]) => any): void;
+    on(ev: string, cb: (ev?: Event) => any): void;
     destroy(): void;
   }
 
@@ -14,6 +14,7 @@ declare module "hammerjs" {
   }
 
   export class Pan extends Recognizer {
+    constructor(opts: { direction: string });
   }
 
   export class Tap extends Recognizer {
@@ -21,5 +22,9 @@ declare module "hammerjs" {
   }
 
   export const DIRECTION_HORIZONTAL: string;
+
+  export class Event {
+    deltaX: number;
+  }
 
 }

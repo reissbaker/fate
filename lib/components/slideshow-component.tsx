@@ -18,20 +18,78 @@ export interface Props extends GkProps {
   engine: Engine;
 }
 
-export class SlideshowComponent extends GkReactComponent<Props, {}> {
+export interface State {
+  panning: boolean;
+  pan: number;
+}
+
+export class SlideshowComponent extends GkReactComponent<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      panning: false,
+      pan: 0,
+    };
+  }
+
   entityCreated(entity: gk.Entity) {
     bindControls(entity, this.props.engine, this, {
       left() { dispatcher.left.dispatch({}); },
       right() { dispatcher.right.dispatch({}); },
       action() { dispatcher.button.dispatch({}); },
+      panstart: () => {
+        this.setState({
+          panning: true,
+          pan: 0,
+        });
+      },
+      pan: (deltaX: number) => {
+        this.setState({
+          panning: this.state.panning,
+          pan: deltaX,
+        });
+      },
+      panend: () => {
+        if(this.percentPan() >= 40) {
+          dispatcher.left.dispatch({});
+        }
+        else if(this.percentPan() <= -40) {
+          dispatcher.right.dispatch({});
+        }
+
+        this.setState({
+          panning: false,
+          pan: 0,
+        });
+      },
     });
+  }
+
+  percentPan() {
+    return (this.state.pan / document.body.clientWidth) * 100;
+  }
+
+  xTranslation() {
+    const index = this.props.dice.indexOf(this.props.die);
+    const translation = (-index * 100) + this.percentPan();
+    const min = -(this.props.dice.length - 1) * 100;
+    const max = 0;
+    if(translation < min) return min;
+    if(translation > max) return max;
+    return translation;
   }
 
   render() {
     const index = this.props.dice.indexOf(this.props.die);
     const style = {
-      transform: 'translateX(' + (-index * 100) + '%)'
+      transform: 'translateX(' + this.xTranslation() + '%)',
+      transition: 'transform 0.7s',
     };
+
+    if(this.state.panning) {
+      style.transition = 'transform 0.05s';
+    }
 
     return (
       <div>

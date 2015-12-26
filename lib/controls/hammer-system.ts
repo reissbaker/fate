@@ -26,6 +26,7 @@ export class HammerSystem extends gk.System {
     this.control = null;
   }
 
+  // TODO: move this into bindControls
   supportTap(hm: Hammer.Manager) {
     hm.add(new Hammer.Tap({ interval: 100, time: 300, threshold: 10 }));
   }
