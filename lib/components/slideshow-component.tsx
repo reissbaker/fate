@@ -57,17 +57,26 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
           velocity: 0,
         });
       },
-      pan: (deltaX: number, velocityX: number) => {
+      pan: (deltaX: number) => {
         const distance = deltaX - this.state.pan;
-        const v = this.state.lastPanTime === 0 ? deltaX / 16 : distance / this.state.lastPanTime;
+        const now = window.performance.now();
+        const deltaTime = now - this.state.lastPanTime;
+        let velocity: number;
+
+        if(this.state.lastPanTime === 0) {
+          velocity = deltaX / 16;
+        } else {
+          velocity = distance / deltaTime;
+        }
+        if(deltaX < 0) velocity = -velocity;
 
         this.setState({
           panning: this.state.panning,
           pan: deltaX,
-          lastPanTime: window.performance.now(),
+          lastPanTime: now,
           enroute: this.state.enroute,
           enrouteFrom: this.state.enrouteFrom,
-          velocity: v,
+          velocity,
         });
       },
       panend: () => {
