@@ -133,11 +133,17 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     return 0.7;
   }
 
+  transitionEasing() {
+    if(this.state.enroute) return 'ease-out';
+    if(this.state.panning) return '';
+    return 'ease-in-out';
+  }
+
   render() {
     const index = this.props.dice.indexOf(this.props.die);
     const style = {
       transform: `translateX(${this.xTranslation()}%)`,
-      transition: `transform ${this.transitionTime()}s`,
+      transition: `transform ${this.transitionTime()}s ${this.transitionEasing()}`,
     };
 
     return (
