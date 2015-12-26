@@ -3,6 +3,7 @@
 import * as gk from 'gamekernel';
 import { GkReactComponent, GkProps } from './gk-react-component.ts';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import * as slide from './slide-component.tsx';
 import { RollIndicatorComponent } from './roll-indicator-component.tsx';
 import { DieType } from '../dice/die-type.ts';
@@ -21,6 +22,9 @@ export interface Props extends GkProps {
 export interface State {
   panning: boolean;
   pan: number;
+  enroute: boolean;
+  enrouteFrom: number;
+  velocity: number;
 }
 
 export class SlideshowComponent extends GkReactComponent<Props, State> {
@@ -30,6 +34,9 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     this.state = {
       panning: false,
       pan: 0,
+      enroute: false,
+      enrouteFrom: 0,
+      velocity: 0,
     };
   }
 
@@ -42,27 +49,58 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         this.setState({
           panning: true,
           pan: 0,
+          enroute: this.state.enroute,
+          enrouteFrom: this.state.enrouteFrom,
+          velocity: 0,
         });
       },
-      pan: (deltaX: number) => {
+      pan: (deltaX: number, velocityX: number) => {
         this.setState({
           panning: this.state.panning,
           pan: deltaX,
+          enroute: this.state.enroute,
+          enrouteFrom: this.state.enrouteFrom,
+          velocity: velocityX,
         });
       },
       panend: () => {
+        let enroute = false;
+        const enrouteFrom = this.xTranslation();
+
         if(this.percentPan() >= 40) {
           dispatcher.left.dispatch({});
+          enroute = true;
         }
         else if(this.percentPan() <= -40) {
           dispatcher.right.dispatch({});
+          enroute = true;
         }
 
         this.setState({
           panning: false,
           pan: 0,
+          velocity: this.state.velocity,
+          enroute,
+          enrouteFrom,
         });
       },
+    });
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+
+    const el = ReactDOM.findDOMNode(this);
+    el.addEventListener('transitionend', () => {
+      if(this.state.enroute) {
+        this.setState({
+          panning: this.state.panning,
+          pan: this.state.pan,
+          enroute: false,
+          enrouteFrom: 0,
+          velocity: 0,
+        });
+      }
     });
   }
 
@@ -80,16 +118,27 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     return translation;
   }
 
+  transitionTime() {
+    if(this.state.panning) return 0.05;
+
+    if(this.state.enroute) {
+      const percentDistance = Math.abs(this.xTranslation() - this.state.enrouteFrom) / 100;
+      const distance = percentDistance * document.body.clientWidth;
+      const velocity = Math.abs(this.state.velocity * 1000);
+      const time = distance / velocity;
+      if(time > 0.7) return 0.7;
+      return time;
+    }
+
+    return 0.7;
+  }
+
   render() {
     const index = this.props.dice.indexOf(this.props.die);
     const style = {
-      transform: 'translateX(' + this.xTranslation() + '%)',
-      transition: 'transform 0.7s',
+      transform: `translateX(${this.xTranslation()}%)`,
+      transition: `transform ${this.transitionTime()}s`,
     };
-
-    if(this.state.panning) {
-      style.transition = 'transform 0.05s';
-    }
 
     return (
       <div>

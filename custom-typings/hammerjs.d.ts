@@ -25,6 +25,7 @@ declare module "hammerjs" {
 
   export class Event {
     deltaX: number;
+    velocityX: number;
   }
 
 }

@@ -42,7 +42,7 @@ export interface Args {
   left?: () => void;
   right?: () => void;
   action?: () => void;
-  pan?: (deltaX: number) => void;
+  pan?: (deltaX?: number, velocityX?: number) => void;
   panstart?: () => void;
   panend?: () => void;
 }
