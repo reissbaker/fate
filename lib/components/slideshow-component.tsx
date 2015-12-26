@@ -68,7 +68,10 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         } else {
           velocity = distance / deltaTime;
         }
+
         if(deltaX < 0) velocity = -velocity;
+
+        velocity = velocity * 0.5 + this.state.velocity * 0.5;
 
         this.setState({
           panning: this.state.panning,
