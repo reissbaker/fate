@@ -65,14 +65,15 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       },
       panend: () => {
         let enroute = false;
+        let dispatch = () => {};
         const enrouteFrom = this.xTranslation();
 
         if(this.percentPan() >= 40) {
-          dispatcher.left.dispatch({});
+          dispatch = () => { dispatcher.left.dispatch({}); };
           enroute = true;
         }
         else if(this.percentPan() <= -40) {
-          dispatcher.right.dispatch({});
+          dispatch = () => { dispatcher.right.dispatch({}); };
           enroute = true;
         }
 
@@ -83,6 +84,8 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
           enroute,
           enrouteFrom,
         });
+
+        dispatch();
       },
     });
   }
@@ -110,7 +113,9 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
   xTranslation() {
     const index = this.props.dice.indexOf(this.props.die);
-    const translation = (-index * 100) + this.percentPan();
+    const target = -index * 100;
+    const offset = this.percentPan();
+    const translation = target + offset;
     const min = -(this.props.dice.length - 1) * 100;
     const max = 0;
     if(translation < min) return min;
@@ -134,16 +139,16 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
   }
 
   transitionEasing() {
-    if(this.state.enroute) return 'ease-out';
-    if(this.state.panning) return '';
-    return 'ease-in-out';
+    if(this.state.enroute || this.state.panning) return 'linear';
+    return 'ease';
   }
 
   render() {
     const index = this.props.dice.indexOf(this.props.die);
     const style = {
+      transition: `transform ${this.transitionTime()}s`,
+      transitionTimingFunction: this.transitionEasing(),
       transform: `translateX(${this.xTranslation()}%)`,
-      transition: `transform ${this.transitionTime()}s ${this.transitionEasing()}`,
     };
 
     return (
