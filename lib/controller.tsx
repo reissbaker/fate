@@ -86,7 +86,7 @@ export class Controller extends React.Component<Props, State> {
           rolls={ this.state.rolls}
           rollDebounceMs={ ROLL_DEBOUNCE_MS }
           engine={ this.engine }
-          world={ this.world }
+          parentEntity={ this.world }
           active={ this.state.screen === ScreenState.Rolling }
         />
         <ResultComponent
@@ -94,7 +94,7 @@ export class Controller extends React.Component<Props, State> {
           die={ this.state.die }
           rolls={ this.state.rolls }
           engine={ this.engine }
-          world={ this.world }
+          parentEntity={ this.world }
           active={ this.state.screen === ScreenState.Results }
         />
       </div>

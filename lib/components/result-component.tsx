@@ -2,49 +2,26 @@
 
 import * as gk from 'gamekernel';
 import React = require('react');
-import * as ReactDOM from 'react-dom';
-import * as Hammer from 'hammerjs';
-import { ActivatableComponent } from './activatable-component.ts';
+import { GkReactComponent, GkProps } from './gk-react-component.ts';
 import { DieType } from '../dice/die-type.ts';
 import Engine from '../engine.ts';
-import KeyboardBehavior from '../controls/keyboard-behavior.ts';
 import { dispatcher } from '../dispatcher.ts';
+import { bindControls } from '../controls/bind-controls.ts';
 
 const HIDE_CLASS = "hidden";
 
-export interface Props {
+export interface Props extends GkProps {
   result: number;
   rolls: number[];
   die: DieType;
   engine: Engine;
-  world: gk.Entity;
-  active: boolean;
 }
 
-export class ResultComponent extends ActivatableComponent<Props, {}> {
-  private _entity: gk.Entity;
-
-  activate() {
-    const world = this.props.world;
-    const engine = this.props.engine;
-
-    this._entity = world.entity();
-    engine.behavior.table.attach(this._entity, new KeyboardBehavior(engine, this));
-
-    const hm = new Hammer.Manager(ReactDOM.findDOMNode(this));
-    engine.hammer.control.attach(this._entity, hm);
-    engine.hammer.supportTap(hm);
-    hm.on("tap", () => {
-      this.action();
+export class ResultComponent extends GkReactComponent<Props, {}> {
+  entityCreated(entity: gk.Entity) {
+    bindControls(entity, this.props.engine, this, {
+      action() { dispatcher.reroll.dispatch({}); },
     });
-  }
-
-  action() {
-    dispatcher.reroll.dispatch({});
-  }
-
-  deactivate() {
-    this._entity.destroy();
   }
 
   render() {

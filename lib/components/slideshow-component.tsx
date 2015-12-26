@@ -1,72 +1,30 @@
 'use strict';
 
 import * as gk from 'gamekernel';
-import { ActivatableComponent } from './activatable-component.ts';
+import { GkReactComponent, GkProps } from './gk-react-component.ts';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as Hammer from 'hammerjs';
 import * as slide from './slide-component.tsx';
 import { RollIndicatorComponent } from './roll-indicator-component.tsx';
 import { DieType } from '../dice/die-type.ts';
 import Engine from '../engine.ts';
-import KeyboardBehavior from '../controls/keyboard-behavior.ts';
 import { dispatcher } from '../dispatcher.ts';
+import { bindControls } from '../controls/bind-controls.ts';
 
-export interface Props {
+export interface Props extends GkProps {
   dice: DieType[];
   die: DieType;
   rolls: number[];
   rollDebounceMs: number;
   engine: Engine;
-  world: gk.Entity;
-  active: boolean;
 }
 
-export interface SlideshowState {
-  slideIndex: number;
-}
-
-export class SlideshowComponent extends ActivatableComponent<Props, SlideshowState> {
-  private _entity: gk.Entity;
-
-  activate() {
-    const world = this.props.world;
-    const engine = this.props.engine;
-
-    this._entity = world.entity();
-
-    // TODO: move control setup into a single function that both this and resultscomponent call
-    engine.behavior.table.attach(this._entity, new KeyboardBehavior(engine, this));
-
-    const hm = new Hammer.Manager(ReactDOM.findDOMNode(this));
-    engine.hammer.control.attach(this._entity, hm);
-    hm.add(new Hammer.Swipe({ direction: Hammer.DIRECTION_HORIZONTAL }));
-    engine.hammer.supportTap(hm);
-    hm.on("swipeleft", () => {
-      this.right();
+export class SlideshowComponent extends GkReactComponent<Props, {}> {
+  entityCreated(entity: gk.Entity) {
+    bindControls(entity, this.props.engine, this, {
+      left() { dispatcher.left.dispatch({}); },
+      right() { dispatcher.right.dispatch({}); },
+      action() { dispatcher.button.dispatch({}); },
     });
-    hm.on("swiperight", () => {
-      this.left();
-    });
-    hm.on("tap", () => {
-      this.action();
-    });
-  }
-
-  deactivate() {
-    this._entity.destroy();
-  }
-
-  left() {
-    dispatcher.left.dispatch({});
-  }
-
-  right() {
-    dispatcher.right.dispatch({});
-  }
-
-  action() {
-    dispatcher.button.dispatch({});
   }
 
   render() {
