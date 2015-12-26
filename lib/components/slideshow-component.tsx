@@ -22,6 +22,7 @@ export interface Props extends GkProps {
 export interface State {
   panning: boolean;
   pan: number;
+  lastPanTime: number;
   enroute: boolean;
   enrouteFrom: number;
   velocity: number;
@@ -34,6 +35,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     this.state = {
       panning: false,
       pan: 0,
+      lastPanTime: 0,
       enroute: false,
       enrouteFrom: 0,
       velocity: 0,
@@ -49,18 +51,23 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         this.setState({
           panning: true,
           pan: 0,
+          lastPanTime: 0,
           enroute: this.state.enroute,
           enrouteFrom: this.state.enrouteFrom,
           velocity: 0,
         });
       },
       pan: (deltaX: number, velocityX: number) => {
+        const distance = deltaX - this.state.pan;
+        const v = this.state.lastPanTime === 0 ? deltaX / 16 : distance / this.state.lastPanTime;
+
         this.setState({
           panning: this.state.panning,
           pan: deltaX,
+          lastPanTime: window.performance.now(),
           enroute: this.state.enroute,
           enrouteFrom: this.state.enrouteFrom,
-          velocity: velocityX,
+          velocity: v,
         });
       },
       panend: () => {
@@ -80,6 +87,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         this.setState({
           panning: false,
           pan: 0,
+          lastPanTime: 0,
           velocity: this.state.velocity,
           enroute,
           enrouteFrom,
@@ -99,6 +107,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         this.setState({
           panning: this.state.panning,
           pan: this.state.pan,
+          lastPanTime: this.state.lastPanTime,
           enroute: false,
           enrouteFrom: 0,
           velocity: 0,
