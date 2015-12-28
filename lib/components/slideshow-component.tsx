@@ -32,8 +32,8 @@ export interface State {
 const MAX_TIME = 0.7;
 const ease = BezierEasing.css["ease-out"];
 const y0 = ease.get(0);
-const y1 = ease.get(0.1);
-const EASE_OUT_SLOPE = (y1 - y0) / 0.1;
+const y1 = ease.get(0.001);
+const EASE_OUT_SLOPE = (y1 - y0) / 0.001;
 
 export class SlideshowComponent extends GkReactComponent<Props, State> {
   constructor(props: Props) {
@@ -100,6 +100,15 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         }
         else if(this.percentPan() <= -40) {
           dispatch = () => { dispatcher.right.dispatch({}); };
+          enroute = true;
+        }
+        else if(this.state.velocity > 0.3) {
+          if(this.percentPan() > 0) {
+            dispatch = () => { dispatcher.left.dispatch({}); };
+          }
+          else {
+            dispatch = () => { dispatcher.right.dispatch({}); };
+          }
           enroute = true;
         }
 
@@ -189,10 +198,10 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     }
 
     const style = {
-      transition: `transform ${this.transitionTime()}s`,
-      transitionTimingFunction: this.transitionEasing(),
+      transition: `transform ${this.transitionTime()}s ${this.transitionEasing()}`,
       transform: `translateX(${this.xTranslation()}%)`,
     };
+
 
     return (
       <div>
