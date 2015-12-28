@@ -16,11 +16,12 @@
     "uglify-js": "^2.5.0"
   },
   "dependencies": {
-    "zeroflux": "0.0.6",
+    "bezier-easing": "^1.1.1",
     "gamekernel": "0.0.13",
     "gk-keyboard": "0.0.3",
     "react": "^0.14.2",
     "react-dom": "^0.14.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "zeroflux": "0.0.6"
   }
 }

@@ -10,6 +10,7 @@ import { DieType } from '../dice/die-type.ts';
 import Engine from '../engine.ts';
 import { dispatcher } from '../dispatcher.ts';
 import { bindControls } from '../controls/bind-controls.ts';
+import * as BezierEasing from 'bezier-easing';
 
 export interface Props extends GkProps {
   dice: DieType[];
@@ -153,16 +154,25 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       const percentDistance = Math.abs(this.xTranslation() - this.state.enrouteFrom) / 100;
       const distance = percentDistance * document.body.clientWidth;
       const velocity = Math.abs(this.state.velocity * 1000);
-      const time = distance / velocity;
+      let time = distance / velocity;
+      const ease = BezierEasing.css["ease-out"];
+      console.log(BezierEasing.css);
+      let y0 = ease.get(0);
+      let y1 = ease.get(0.1);
+      let m = (y1 - y0) / 0.1;
+
       if(time > MAX_TIME) return MAX_TIME;
-      return time;
+      //return time;
+      return time * m;
     }
 
     return MAX_TIME;
   }
 
   transitionEasing() {
-    if(this.state.enroute || this.state.panning) return 'linear';
+    if(this.state.panning) return 'linear';
+    //if(this.state.enroute) return 'linear';
+    if(this.state.enroute) return 'ease-out';
     return 'ease';
   }
 
