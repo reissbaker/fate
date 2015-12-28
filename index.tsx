@@ -10,7 +10,7 @@ import * as gk from 'gamekernel';
 import Engine from './lib/engine';
 
 const kernel = new gk.Kernel();
-const runner = new gk.Runner(kernel, 30);
+const runner = new gk.Runner(kernel, 60);
 const engine = new Engine(kernel, runner);
 engine.start();
 
