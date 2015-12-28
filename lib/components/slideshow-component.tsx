@@ -30,6 +30,10 @@ export interface State {
 }
 
 const MAX_TIME = 0.7;
+const ease = BezierEasing.css["ease-out"];
+const y0 = ease.get(0);
+const y1 = ease.get(0.1);
+const EASE_OUT_SLOPE = (y1 - y0) / 0.1;
 
 export class SlideshowComponent extends GkReactComponent<Props, State> {
   constructor(props: Props) {
@@ -154,14 +158,10 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       const percentDistance = Math.abs(this.xTranslation() - this.state.enrouteFrom) / 100;
       const distance = percentDistance * document.body.clientWidth;
       const velocity = Math.abs(this.state.velocity * 1000);
-      let time = distance / velocity;
-      const ease = BezierEasing.css["ease-out"];
-      let y0 = ease.get(0);
-      let y1 = ease.get(0.1);
-      let m = (y1 - y0) / 0.1;
+      let time = distance / velocity * EASE_OUT_SLOPE;
 
       if(time > MAX_TIME) return MAX_TIME;
-      return time * m;
+      return time;
     }
 
     return MAX_TIME;
