@@ -162,7 +162,6 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       let m = (y1 - y0) / 0.1;
 
       if(time > MAX_TIME) return MAX_TIME;
-      //return time;
       return time * m;
     }
 
@@ -171,7 +170,6 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
   transitionEasing() {
     if(this.state.panning) return 'linear';
-    //if(this.state.enroute) return 'linear';
     if(this.state.enroute) return 'ease-out';
     return 'ease';
   }
