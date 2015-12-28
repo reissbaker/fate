@@ -32,8 +32,8 @@ export interface State {
 
 const ease = BezierEasing.css["ease-out"];
 const y0 = ease.get(0);
-const y1 = ease.get(0.001);
-const EASE_OUT_SLOPE = (y1 - y0) / 0.001;
+const y1 = ease.get(0.05);
+const EASE_OUT_SLOPE = (y1 - y0) / 0.05;
 
 const LEFT_DISPATCH = () => { dispatcher.left.dispatch({}); };
 const RIGHT_DISPATCH = () => { dispatcher.right.dispatch({}); };
@@ -156,10 +156,6 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     return 0.4;
   }
 
-  nonEnrouteTimePadding() {
-    return 0.1;
-  }
-
   transitionTime() {
     if(this.state.panning) return 0.05;
 
@@ -174,7 +170,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       return time;
     }
 
-    return maxTime + this.nonEnrouteTimePadding();
+    return maxTime;
   }
 
   transitionEasing() {
