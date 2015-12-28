@@ -98,7 +98,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
           dispatch = () => { dispatcher.right.dispatch({}); };
           enroute = true;
         }
-        else if(this.state.velocity > 0.3) {
+        else if(this.state.velocity > 0.2) {
           if(this.percentPan() > 0) {
             dispatch = () => { dispatcher.left.dispatch({}); };
           }
