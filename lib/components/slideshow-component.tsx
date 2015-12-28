@@ -156,7 +156,6 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       const velocity = Math.abs(this.state.velocity * 1000);
       let time = distance / velocity;
       const ease = BezierEasing.css["ease-out"];
-      console.log(BezierEasing.css);
       let y0 = ease.get(0);
       let y1 = ease.get(0.1);
       let m = (y1 - y0) / 0.1;
