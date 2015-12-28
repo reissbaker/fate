@@ -1,9 +1,10 @@
 'use strict';
 
 import * as gk from 'gamekernel';
-import { GkReactComponent, GkProps } from './gk-react-component.ts';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { extend } from 'underscore';
+import { GkReactComponent, GkProps } from './gk-react-component.ts';
 import * as slide from './slide-component.tsx';
 import { RollIndicatorComponent } from './roll-indicator-component.tsx';
 import { DieType } from '../dice/die-type.ts';
@@ -55,14 +56,12 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       right() { dispatcher.right.dispatch({}); },
       action() { dispatcher.button.dispatch({}); },
       panstart: () => {
-        this.setState({
+        this.setState(extend({}, this.state, {
           panning: true,
           pan: 0,
           lastPanTime: 0,
-          enroute: this.state.enroute,
-          enrouteFrom: this.state.enrouteFrom,
           velocity: 0,
-        });
+        }));
       },
       pan: (deltaX: number) => {
         const distance = deltaX - this.state.pan;
@@ -80,14 +79,11 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
         velocity = velocity * 0.25 + this.state.velocity * 0.75;
 
-        this.setState({
-          panning: this.state.panning,
+        this.setState(extend({}, this.state, {
           pan: deltaX,
           lastPanTime: now,
-          enroute: this.state.enroute,
-          enrouteFrom: this.state.enrouteFrom,
           velocity,
-        });
+        }));
       },
       panend: () => {
         let enroute = false;
@@ -112,14 +108,13 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
           enroute = true;
         }
 
-        this.setState({
+        this.setState(extend({}, this.state, {
           panning: false,
           pan: 0,
           lastPanTime: 0,
-          velocity: this.state.velocity,
           enroute,
           enrouteFrom,
-        });
+        }));
 
         dispatch();
       },
@@ -132,14 +127,11 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     const el = ReactDOM.findDOMNode(this);
     el.addEventListener('transitionend', () => {
       if(this.state.enroute) {
-        this.setState({
-          panning: this.state.panning,
-          pan: this.state.pan,
-          lastPanTime: this.state.lastPanTime,
+        this.setState(extend({}, this.state, {
           enroute: false,
           enrouteFrom: 0,
           velocity: 0,
-        });
+        }));
       }
     });
   }
@@ -212,7 +204,6 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       transition: `transform ${this.transitionTime()}s ${this.transitionEasing()}`,
       transform: `translateX(${this.xTranslation()}%)`,
     };
-
 
     return (
       <div>
