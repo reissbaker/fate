@@ -160,20 +160,31 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     return translation;
   }
 
+  maxTime() {
+    const width = document.body.clientWidth;
+    if(width > 1000) return 0.6;
+    return 0.4;
+  }
+
+  nonEnrouteTimePadding() {
+    return 0.1;
+  }
+
   transitionTime() {
     if(this.state.panning) return 0.05;
 
+    const maxTime = this.maxTime();
     if(this.state.enroute) {
       const percentDistance = Math.abs(this.xTranslation() - this.state.enrouteFrom) / 100;
       const distance = percentDistance * document.body.clientWidth;
       const velocity = Math.abs(this.state.velocity * 1000);
       let time = distance / velocity * EASE_OUT_SLOPE;
 
-      if(time > MAX_TIME) return MAX_TIME;
+      if(time > maxTime) return maxTime;
       return time;
     }
 
-    return MAX_TIME;
+    return maxTime + this.nonEnrouteTimePadding();
   }
 
   transitionEasing() {
