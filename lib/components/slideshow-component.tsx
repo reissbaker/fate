@@ -152,8 +152,8 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
   maxTime() {
     const width = document.body.clientWidth;
-    if(width > 1000) return 0.6;
-    return 0.4;
+    if(width > 1000) return 0.5;
+    return 0.28;
   }
 
   transitionTime() {
@@ -170,7 +170,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       return time;
     }
 
-    return maxTime;
+    return maxTime + 0.1;
   }
 
   transitionEasing() {
