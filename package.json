@@ -22,6 +22,6 @@
     "react": "^0.14.2",
     "react-dom": "^0.14.2",
     "underscore": "^1.8.3",
-    "zeroflux": "0.0.6"
+    "zeroflux": "0.0.8"
   }
 }

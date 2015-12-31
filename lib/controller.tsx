@@ -4,7 +4,7 @@ import * as _ from 'underscore';
 import * as React from 'react';
 import * as gk from 'gamekernel';
 import Engine from './engine.ts';
-import { SlideshowComponent } from './components/slideshow-component.tsx';
+import { SlideshowComponent } from './components/slideshow/slideshow-component.tsx';
 import { ResultComponent } from './components/result-component.tsx';
 import * as dieType from './dice/die-type.ts';
 import { diceStore } from './stores/dice-store.ts';

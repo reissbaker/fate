@@ -4,14 +4,17 @@ import * as gk from 'gamekernel';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { extend } from 'underscore';
-import { GkReactComponent, GkProps } from './gk-react-component.ts';
+import { GkReactComponent, GkProps } from '../gk-react-component.ts';
+import { app } from '../../flux-app.ts';
 import * as slide from './slide-component.tsx';
-import { RollIndicatorComponent } from './roll-indicator-component.tsx';
-import { DieType } from '../dice/die-type.ts';
-import Engine from '../engine.ts';
-import { dispatcher } from '../dispatcher.ts';
-import { bindControls } from '../controls/bind-controls.ts';
+import { RollIndicatorComponent } from '../roll-indicator-component.tsx';
+import { DieType } from '../../dice/die-type.ts';
+import Engine from '../../engine.ts';
+import { dispatcher } from '../../dispatcher.ts';
+import { bindControls } from '../../controls/bind-controls.ts';
 import * as BezierEasing from 'bezier-easing';
+import * as slideDispatcher from './slideshow-dispatcher.ts';
+import * as panstate from './pan-state.ts';
 
 export interface Props extends GkProps {
   dice: DieType[];
@@ -24,10 +27,9 @@ export interface Props extends GkProps {
 export interface State {
   panning: boolean;
   pan: number;
-  lastPanTime: number;
+  velocity: number;
   enroute: boolean;
   enrouteFrom: number;
-  velocity: number;
 }
 
 const ease = BezierEasing.css["ease-out"];
@@ -38,18 +40,54 @@ const EASE_OUT_SLOPE = (y1 - y0) / 0.05;
 const LEFT_DISPATCH = () => { dispatcher.left.dispatch({}); };
 const RIGHT_DISPATCH = () => { dispatcher.right.dispatch({}); };
 
+const SWIPE_VELOCITY = 0.2;
+const MAX_SLOW_PAN = 40;
+
 export class SlideshowComponent extends GkReactComponent<Props, State> {
+  // Note that this is only safe because we never actually destroy the slideshow component. If we
+  // did, we'd have to get the dispatcher and store from some singleton so that this wasn't getting
+  // constantly initialized and so that history rewinding would result in this picking up the
+  // correct previous histories.
+  //
+  // TODO: fix this in zeroflux? app.dispatcher and app.store could take IDs, and would init if the
+  // id doesn't exist and would return old objects if it does.
+  private _slideDispatcher = slideDispatcher.build(app);
+  private _panStore = panstate.build(app, this._slideDispatcher);
+
   constructor(props: Props) {
     super(props);
 
     this.state = {
       panning: false,
       pan: 0,
-      lastPanTime: 0,
+      velocity: 0,
       enroute: false,
       enrouteFrom: 0,
-      velocity: 0,
     };
+
+    this._panStore.watch((state, prevState) => {
+      let dispatch = () => {};
+      let enroute = false;
+      const enrouteFrom = this.xTranslation();
+
+      if(prevState.panning && !state.panning) {
+        const percentPan = this.percentPan(prevState.pan);
+
+        if(Math.abs(percentPan) >= MAX_SLOW_PAN || prevState.velocity > SWIPE_VELOCITY) {
+          dispatch = percentPan > 0 ? LEFT_DISPATCH : RIGHT_DISPATCH;
+          enroute = true;
+        }
+      }
+
+      this.setState(extend({}, this.state, {
+        panning: state.panning,
+        pan: state.pan,
+        enroute,
+        enrouteFrom,
+      }));
+
+      dispatch();
+    });
   }
 
   entityCreated(entity: gk.Entity) {
@@ -57,65 +95,10 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       left() { dispatcher.left.dispatch({}); },
       right() { dispatcher.right.dispatch({}); },
       action() { dispatcher.button.dispatch({}); },
-      panstart: () => {
-        this.setState(extend({}, this.state, {
-          panning: true,
-          pan: 0,
-          lastPanTime: 0,
-          velocity: 0,
-        }));
-      },
-      pan: (deltaX: number) => {
-        const distance = deltaX - this.state.pan;
-        const now = window.performance.now();
-        const deltaTime = now - this.state.lastPanTime;
-        let velocity: number;
 
-        if(this.state.lastPanTime === 0) {
-          velocity = deltaX / 16;
-        } else {
-          velocity = distance / deltaTime;
-        }
-
-        if(deltaX < 0) velocity = -velocity;
-
-        velocity = velocity * 0.25 + this.state.velocity * 0.75;
-
-        this.setState(extend({}, this.state, {
-          pan: deltaX,
-          lastPanTime: now,
-          velocity,
-        }));
-      },
-      panend: () => {
-        let enroute = false;
-        let dispatch = () => {};
-        const enrouteFrom = this.xTranslation();
-
-        if(this.percentPan() >= 40) {
-          dispatch = LEFT_DISPATCH;
-          enroute = true;
-        }
-        else if(this.percentPan() <= -40) {
-          dispatch = RIGHT_DISPATCH;
-          enroute = true;
-        }
-        else if(this.state.velocity > 0.2) {
-          if(this.percentPan() > 0) dispatch = LEFT_DISPATCH;
-          else dispatch = RIGHT_DISPATCH;
-          enroute = true;
-        }
-
-        this.setState(extend({}, this.state, {
-          panning: false,
-          pan: 0,
-          lastPanTime: 0,
-          enroute,
-          enrouteFrom,
-        }));
-
-        dispatch();
-      },
+      panstart: () => { this._slideDispatcher.panstart.dispatch({}); },
+      pan: (deltaX: number) => { this._slideDispatcher.pan.dispatch({ deltaX }); },
+      panend: () => { this._slideDispatcher.panend.dispatch({}); },
     });
   }
 
@@ -128,20 +111,19 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         this.setState(extend({}, this.state, {
           enroute: false,
           enrouteFrom: 0,
-          velocity: 0,
         }));
       }
     });
   }
 
-  percentPan() {
-    return (this.state.pan / document.body.clientWidth) * 100;
+  percentPan(pan: number) {
+    return (pan / document.body.clientWidth) * 100;
   }
 
   xTranslation() {
     const index = this.props.dice.indexOf(this.props.die);
     const target = -index * 100;
-    const offset = this.percentPan();
+    const offset = this.percentPan(this.state.pan);
     const translation = target + offset;
     const min = -(this.props.dice.length - 1) * 100;
     const max = 0;
@@ -182,7 +164,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
   render() {
     let index = this.props.dice.indexOf(this.props.die);
     if(this.state.panning) {
-      const pan = this.percentPan();
+      const pan = this.percentPan(this.state.pan);
 
       if(pan >= 40) {
         index = index - 1;
