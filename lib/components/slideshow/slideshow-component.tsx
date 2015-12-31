@@ -43,6 +43,10 @@ const RIGHT_DISPATCH = () => { dispatcher.right.dispatch({}); };
 const SWIPE_VELOCITY = 0.2;
 const MAX_SLOW_PAN = 40;
 
+const DEFAULT_TRANSITION = 'ease';
+const PAN_TRANSITION = 'linear';
+const ENROUTE_TRANSITION = 'ease-out';
+
 export class SlideshowComponent extends GkReactComponent<Props, State> {
   // Note that this is only safe because we never actually destroy the slideshow component. If we
   // did, we'd have to get the dispatcher and store from some singleton so that this wasn't getting
@@ -78,9 +82,15 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       let enroute = false;
       const enrouteFrom = this.xTranslation(this.state.pan);
 
+      // If we're done panning, special cases
       if(prevState.panning && !state.panning) {
-        const percentPan = this.percentPan(prevState.pan);
+        // Need to reset the pan and transition, since React hasn't been keeping track of it (we've
+        // been skipping it via fastPan calls).
+        this.resetDefaultTransition();
+        this.fastPan(state.pan);
 
+        // We may need to consider this a swipe and move to next screen
+        const percentPan = this.percentPan(prevState.pan);
         if(Math.abs(percentPan) >= MAX_SLOW_PAN || prevState.velocity > SWIPE_VELOCITY) {
           dispatch = percentPan > 0 ? LEFT_DISPATCH : RIGHT_DISPATCH;
           enroute = true;
@@ -166,9 +176,15 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
   }
 
   transitionEasing() {
-    if(this.state.panning) return 'linear';
-    if(this.state.enroute) return 'ease-out';
-    return 'ease';
+    if(this.state.panning) return PAN_TRANSITION;
+    if(this.state.enroute) return ENROUTE_TRANSITION;
+    return DEFAULT_TRANSITION;
+  }
+
+  resetDefaultTransition() {
+    const node = ReactDOM.findDOMNode(this);
+    const el = node.querySelector('.slideshow') as HTMLElement;
+    el.style.transition = `transform ${this.maxTime()}s ${DEFAULT_TRANSITION}`;
   }
 
   fastPan(pan: number) {
