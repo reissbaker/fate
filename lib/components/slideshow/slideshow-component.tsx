@@ -57,10 +57,12 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
   constructor(props: Props) {
     super(props);
 
+    const initialPanState = this._panStore.state;
+
     this.state = {
-      panning: false,
-      pan: 0,
-      velocity: 0,
+      panning: initialPanState.panning,
+      pan: initialPanState.pan,
+      velocity: initialPanState.velocity,
       enroute: false,
       enrouteFrom: 0,
     };
@@ -79,12 +81,13 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
         }
       }
 
-      this.setState(extend({}, this.state, {
+      this.setState({
         panning: state.panning,
         pan: state.pan,
+        velocity: state.velocity,
         enroute,
         enrouteFrom,
-      }));
+      });
 
       dispatch();
     });
