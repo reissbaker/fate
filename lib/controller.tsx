@@ -29,7 +29,10 @@ export class Controller extends React.Component<Props, State> {
   private world: gk.Entity = null;
   private controlEntity: gk.Entity = null;
   private countdown = _.debounce(() => {
-    this.setScreen(ScreenState.Results);
+    // Assuming there are results to display, display them.
+    // Why bother with the check? Because if the screen switches mid-debounce, the rolls will get
+    // reset and showing the "result" is useless and confusing.
+    if(this.state.rolls.length > 0) this.setScreen(ScreenState.Results);
   }, ROLL_DEBOUNCE_MS);
 
   constructor(props: Props) {
