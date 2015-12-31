@@ -285,12 +285,13 @@ var SlideshowComponent = (function (_super) {
                     enroute = true;
                 }
             }
-            _this.setState(underscore_1.extend({}, _this.state, {
+            _this.setState({
                 panning: state.panning,
                 pan: state.pan,
+                velocity: state.velocity,
                 enroute: enroute,
                 enrouteFrom: enrouteFrom,
-            }));
+            });
             dispatch();
         });
     }
