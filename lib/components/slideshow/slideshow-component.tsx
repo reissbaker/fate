@@ -68,9 +68,15 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     };
 
     this._panStore.watch((state, prevState) => {
+      // If we're just panning around, do fast native DOM manipulation rather than a full rerender
+      if(state.panning && prevState.panning) {
+        this.fastPan(state.pan);
+        return;
+      }
+
       let dispatch = () => {};
       let enroute = false;
-      const enrouteFrom = this.xTranslation();
+      const enrouteFrom = this.xTranslation(this.state.pan);
 
       if(prevState.panning && !state.panning) {
         const percentPan = this.percentPan(prevState.pan);
@@ -123,10 +129,10 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     return (pan / document.body.clientWidth) * 100;
   }
 
-  xTranslation() {
+  xTranslation(pan: number) {
     const index = this.props.dice.indexOf(this.props.die);
     const target = -index * 100;
-    const offset = this.percentPan(this.state.pan);
+    const offset = this.percentPan(pan);
     const translation = target + offset;
     const min = -(this.props.dice.length - 1) * 100;
     const max = 0;
@@ -146,7 +152,8 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
     const maxTime = this.maxTime();
     if(this.state.enroute) {
-      const percentDistance = Math.abs(this.xTranslation() - this.state.enrouteFrom) / 100;
+      const translation = this.xTranslation(this.state.pan);
+      const percentDistance = Math.abs(translation - this.state.enrouteFrom) / 100;
       const distance = percentDistance * document.body.clientWidth;
       const velocity = Math.abs(this.state.velocity * 1000);
       let time = distance / velocity * EASE_OUT_SLOPE;
@@ -164,24 +171,17 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     return 'ease';
   }
 
+  fastPan(pan: number) {
+    const node = ReactDOM.findDOMNode(this);
+    const el = node.querySelector('.slideshow') as HTMLElement;
+    el.style.transform = `translateX(${this.xTranslation(pan)}%)`;
+  }
+
   render() {
-    let index = this.props.dice.indexOf(this.props.die);
-    if(this.state.panning) {
-      const pan = this.percentPan(this.state.pan);
-
-      if(pan >= 40) {
-        index = index - 1;
-        if(index < 0) index = 0;
-      }
-      else if(pan <= -40) {
-        index = index + 1;
-        if(index >= this.props.dice.length) index = this.props.dice.length - 1;
-      }
-    }
-
+    const index = this.props.dice.indexOf(this.props.die);
     const style = {
       transition: `transform ${this.transitionTime()}s ${this.transitionEasing()}`,
-      transform: `translateX(${this.xTranslation()}%)`,
+      transform: `translateX(${this.xTranslation(this.state.pan)}%)`,
     };
 
     return (
