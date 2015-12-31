@@ -84,16 +84,17 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
       // If we're done panning, special cases
       if(prevState.panning && !state.panning) {
-        // Need to reset the pan and transition, since React hasn't been keeping track of it (we've
-        // been skipping it via fastPan calls).
-        this.resetDefaultTransition();
-        this.fastPan(state.pan);
-
         // We may need to consider this a swipe and move to next screen
         const percentPan = this.percentPan(prevState.pan);
         if(Math.abs(percentPan) >= MAX_SLOW_PAN || prevState.velocity > SWIPE_VELOCITY) {
           dispatch = percentPan > 0 ? LEFT_DISPATCH : RIGHT_DISPATCH;
           enroute = true;
+        }
+        else {
+          // Need to reset the pan and transition, since React hasn't been keeping track of it
+          // (we've been skipping it via fastPan calls).
+          this.resetDefaultTransition();
+          this.fastPan(state.pan);
         }
       }
 
