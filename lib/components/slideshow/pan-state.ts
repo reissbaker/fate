@@ -55,7 +55,7 @@ export function build(app: flux.App, dispatcher: Dispatcher) {
       });
     });
 
-    return  {
+    return {
       panning: false,
       pan: 0,
       lastPanTime: 0,
