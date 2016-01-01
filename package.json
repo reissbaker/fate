@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf build && mkdir -p build && ./node_modules/.bin/browserify -s roller -p tsify -d index.tsx > build/roller.js && ./node_modules/.bin/uglifyjs -m -o build/roller.min.js build/roller.js"
+    "build": "rm -rf build && mkdir -p build && ./node_modules/.bin/browserify -s roller -p tsify -d index.tsx > build/roller.js && ./node_modules/.bin/uglifyjs -m -c dead_code,unsafe -o build/roller.min.js build/roller.js && gzip -c build/roller.min.js > build/roller.min.js.gz"
   },
   "author": "Matt Baker",
   "license": "ISC",
