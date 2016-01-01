@@ -182,16 +182,17 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
     return DEFAULT_TRANSITION;
   }
 
-  resetDefaultTransition() {
+  slideshowEl() {
     const node = ReactDOM.findDOMNode(this);
-    const el = node.querySelector('.slideshow') as HTMLElement;
-    el.style.transition = `transform ${this.maxTime()}s ${DEFAULT_TRANSITION}`;
+    return node.querySelector('.slideshow') as HTMLElement;
+  }
+
+  resetDefaultTransition() {
+    this.slideshowEl().style.transition = `transform ${this.maxTime()}s ${DEFAULT_TRANSITION}`;
   }
 
   fastPan(pan: number) {
-    const node = ReactDOM.findDOMNode(this);
-    const el = node.querySelector('.slideshow') as HTMLElement;
-    el.style.transform = `translateX(${this.xTranslation(pan)}%)`;
+    this.slideshowEl().style.transform = `translateX(${this.xTranslation(pan)}%)`;
   }
 
   render() {
