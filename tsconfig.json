@@ -5,8 +5,5 @@
     "target": "es5",
     "jsx": "react",
     "outDir": "build/"
-  },
-  "files": [
-    "index.tsx"
-  ]
+  }
 }
