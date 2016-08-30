@@ -195,7 +195,7 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
   }
 
   resetDefaultTransition() {
-    this.slideshowEl().style.transition = `transform ${this.maxTime()}s ${DEFAULT_TRANSITION}`;
+    //this.slideshowEl().style.transition = `transform ${this.maxTime()}s ${DEFAULT_TRANSITION}`;
   }
 
   fastPan(pan: number) {
@@ -205,7 +205,9 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
   render() {
     const index = this.props.dice.indexOf(this.props.die);
     const style = {
+      /*
       transition: `transform ${this.transitionTime()}s ${this.transitionEasing()}`,
+      */
       transform: `translateX(${this.xTranslation(this.state.pan)}%)`,
     };
 
