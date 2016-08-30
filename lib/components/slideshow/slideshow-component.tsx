@@ -3,7 +3,7 @@
 import * as gk from 'gamekernel';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { extend } from 'underscore';
+import { extend, isEqual } from 'underscore';
 import { GkReactComponent, GkProps } from '../gk-react-component.ts';
 import { app } from '../../flux-app.ts';
 import * as slide from './slide-component.tsx';
@@ -37,6 +37,7 @@ const y0 = ease.get(0);
 const y1 = ease.get(0.05);
 const EASE_OUT_SLOPE = (y1 - y0) / 0.05;
 
+const NO_DISPATCH = () => {};
 const LEFT_DISPATCH = () => { dispatcher.left.dispatch({}); };
 const RIGHT_DISPATCH = () => { dispatcher.right.dispatch({}); };
 
@@ -71,30 +72,18 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
       enrouteFrom: 0,
     };
 
-    this._panStore.watch((state, prevState) => {
-      // If we're just panning around, do fast native DOM manipulation rather than a full rerender
-      if(state.panning && prevState.panning) {
-        this.fastPan(state.pan);
-        return;
-      }
-
-      let dispatch = () => {};
+    this._panStore.watch((state) => {
+      let dispatch = NO_DISPATCH;
       let enroute = false;
-      const enrouteFrom = this.xTranslation(this.state.pan);
+      let enrouteFrom = 0;
 
-      // If we're done panning, special cases
-      if(prevState.panning && !state.panning) {
-        // We may need to consider this a swipe and move to next screen
-        const percentPan = this.percentPan(prevState.pan);
-        if(Math.abs(percentPan) >= MAX_SLOW_PAN || prevState.velocity > SWIPE_VELOCITY) {
+      // If we're done panning, we may need to consider this a swipe and move to next screen
+      if(this.state.panning && !state.panning) {
+        const percentPan = this.percentPan(this.state.pan);
+        if(Math.abs(percentPan) >= MAX_SLOW_PAN || this.state.velocity > SWIPE_VELOCITY) {
           dispatch = percentPan > 0 ? LEFT_DISPATCH : RIGHT_DISPATCH;
           enroute = true;
-        }
-        else {
-          // Need to reset the pan and transition, since React hasn't been keeping track of it
-          // (we've been skipping it via fastPan calls).
-          this.resetDefaultTransition();
-          this.fastPan(state.pan);
+          enrouteFrom = this.xTranslation(this.state.pan);
         }
       }
 
@@ -108,6 +97,24 @@ export class SlideshowComponent extends GkReactComponent<Props, State> {
 
       dispatch();
     });
+  }
+
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if(isEqual(this.props, nextProps)) {
+      if(this.state.panning && nextState.panning) {
+        this.fastPan(nextState.pan);
+        return false;
+      }
+      else if(this.state.panning && !nextState.panning) {
+        // Need to reset the pan and transition, since React hasn't been keeping track of it
+        // (we've been skipping it and setting the pan directly in the above block).
+        this.resetDefaultTransition();
+        this.fastPan(nextState.pan);
+        return true;
+      }
+    }
+
+    return true;
   }
 
   entityCreated(entity: gk.Entity) {
