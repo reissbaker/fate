@@ -19,7 +19,7 @@
     "bezier-easing": "^1.1.1",
     "gamekernel": "0.0.13",
     "gk-keyboard": "0.0.3",
-    "hammerjs": "^2.0.4",
+    "hammerjs": "^2.0.6",
     "react": "^0.14.5",
     "react-dom": "^0.14.2",
     "underscore": "^1.8.3",
